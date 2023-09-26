@@ -1,6 +1,16 @@
 {
   "dependencies": {
-    "inquirer": "^8.2.4",
+    "inquirer": "^8.2.6",
     "mysql2": "^3.6.1"
-  }
+  },
+  "name": "work-database-",
+  "description": "",
+  "version": "1.0.0",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

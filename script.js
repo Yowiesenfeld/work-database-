@@ -17,7 +17,6 @@ connection.connect((err) => {
   console.log('Connected to the MySQL database');
   startApp();
 });
-// the code above connects my code to mysql
 
 function startApp() {
   inquirer
@@ -36,9 +35,7 @@ function startApp() {
         'Exit',
       ],
     })
-// the code above prompts user to choose what they would like to see
-
-     .then((choice) => {
+    .then((choice) => {
       switch (choice.action) {
         case 'View all departments':
           viewDepartments();
@@ -66,11 +63,8 @@ function startApp() {
           connection.end(); // Close the database connection
           return;
       }
-
-      startApp();
     });
 }
-// the code above allows the client to add and update the info on the tables
 
 function viewDepartments() {
   connection.query('SELECT * FROM department', (err, results) => {
@@ -94,7 +88,7 @@ function viewRoles() {
       return;
     }
 
-    console.log('\nAll Role:\n');
+    console.log('\nAll Roles:\n');
     console.table(results);
 
     // Return to the main menu
@@ -109,14 +103,13 @@ function viewEmployees() {
       return;
     }
 
-    console.log('\nAll Departments:\n');
+    console.log('\nAll Employees:\n');
     console.table(results);
 
     // Return to the main menu
     startApp();
   });
 }
-// the codes above allows clients to view tables they want to
 
 function addDepartment() {
   inquirer
@@ -126,6 +119,12 @@ function addDepartment() {
       message: 'Enter the name of the department:',
     })
     .then((answer) => {
+      if (!answer.departmentName) {
+        console.log('Please enter a valid department name.');
+        startApp(); // Return to the main menu
+        return;
+      }
+
       connection.query('INSERT INTO department (name) VALUES (?)', [answer.departmentName], (err, results) => {
         if (err) {
           console.error('Error adding department:', err);
@@ -137,43 +136,94 @@ function addDepartment() {
     });
 }
 
-
 function addRole() {
   inquirer
-    .prompt({
-      type: 'input',
-      name: 'Name',
-      message: 'Enter the name of the role:',
-    })
+    .prompt([
+      {
+        type: 'input',
+        name: 'title',
+        message: 'Enter the title of the role:',
+      },
+      {
+        type: 'input',
+        name: 'salary',
+        message: 'Enter the salary for the role:',
+      },
+      {
+        type: 'input',
+        name: 'department_id',
+        message: 'Enter the department ID for the role:',
+      },
+    ])
     .then((answer) => {
-      connection.query('INSERT INTO role (name) VALUES (?)', [answer.roleName], (err, results) => {
-        if (err) {
-          console.error('Error adding role:', err);
-          return;
-        }
-        console.log('Role added successfully!');
+      if (!answer.title || !answer.salary || !answer.department_id) {
+        console.log('Please enter valid values for title, salary, and department ID.');
         startApp(); // Return to the main menu
-      });
+        return;
+      }
+
+      connection.query(
+        'INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)',
+        [answer.title, answer.salary, answer.department_id],
+        (err, results) => {
+          if (err) {
+            console.error('Error adding role:', err);
+            return;
+          }
+          console.log('Role added successfully!');
+          startApp(); // Return to the main menu
+        }
+      );
     });
 }
 
 
 function addEmployee() {
   inquirer
-    .prompt({
-      type: 'input',
-      name: 'employeeName',
-      message: 'Enter the name of the employee:',
-    })
+    .prompt([
+      {
+        type: 'input',
+        name: 'first_name',
+        message: 'Enter the first name of the employee:',
+      },
+      {
+        type: 'input',
+        name: 'last_name',
+        message: 'Enter the last name of the employee:',
+      },
+      {
+        type: 'input',
+        name: 'role_id',
+        message: 'Enter the role ID of the employee:',
+      },
+      {
+        type: 'input',
+        name: 'manager_id',
+        message: 'Enter the manager ID of the employee (optional):',
+      },
+    ])
     .then((answer) => {
-      connection.query('INSERT INTO employee (name) VALUES (?)', [answer.employeetName], (err, results) => {
-        if (err) {
-          console.error('Error adding employee:', err);
-          return;
-        }
-        console.log('Employee added successfully!');
+      if (!answer.first_name || !answer.last_name || !answer.role_id) {
+        console.log('Please enter valid values for first name, last name, and role ID.');
         startApp(); // Return to the main menu
-      });
+        return;
+      }
+
+      // If manager_id is not provided, set it to NULL
+      const managerId = answer.manager_id || null;
+
+      connection.query(
+        'INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)',
+        [answer.first_name, answer.last_name, answer.role_id, managerId],
+        (err, results) => {
+          if (err) {
+            console.error('Error adding employee:', err);
+            return;
+          }
+          console.log('Employee added successfully!');
+          startApp(); // Return to the main menu
+        }
+      );
     });
 }
 
@@ -196,7 +246,6 @@ function updateEmployeeRole() {
       const employeeId = parseInt(answers.employeeId);
       const newRoleId = parseInt(answers.newRoleId);
 
-
       connection.query(
         'UPDATE employee SET role_id = ? WHERE id = ?',
         [newRoleId, employeeId],
@@ -218,5 +267,3 @@ function updateEmployeeRole() {
       );
     });
 }
-
-// the codes above allow clients to add and update the data in the tables
