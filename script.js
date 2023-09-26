@@ -5,7 +5,8 @@ const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: 'Smile123',
-  database: 'your_database',
+  database: 'work',
+  port: 3306,
 });
 
 connection.connect((err) => {
@@ -13,7 +14,7 @@ connection.connect((err) => {
     console.error('Error connecting to the database:', err);
     return;
   }
-  this.log('Connected to the MySQL database');
+  console.log('Connected to the MySQL database');
   startApp();
 });
 // the code above connects my code to mysql
@@ -125,7 +126,7 @@ function addDepartment() {
       message: 'Enter the name of the department:',
     })
     .then((answer) => {
-      connection.query('INSERT INTO departments (name) VALUES (?)', [answer.departmentName], (err, results) => {
+      connection.query('INSERT INTO department (name) VALUES (?)', [answer.departmentName], (err, results) => {
         if (err) {
           console.error('Error adding department:', err);
           return;
